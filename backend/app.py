@@ -7,7 +7,6 @@ from db import query, execute
 
 app = Flask(__name__, static_folder='frontend/dist', static_url_path='/')
 
-# Weak session secret key
 app.secret_key = os.environ.get("SECRET_KEY", "admin-secret")
 
 ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
@@ -119,7 +118,6 @@ def get_inventory():
         return jsonify({"error": str(e)}), 500
 
 
-# Path traversal — no sanitization on filename
 @app.route("/admin/files/<path:filename>")
 @login_required
 def download_file(filename):

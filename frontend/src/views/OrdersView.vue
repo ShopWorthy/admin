@@ -18,7 +18,6 @@
               </select>
             </td>
             <td>${{ Number(order.total).toFixed(2) }}</td>
-            <!-- Renders HTML from order notes — stored XSS vector -->
             <td v-html="order.notes"></td>
             <td>{{ order.created_at }}</td>
             <td>

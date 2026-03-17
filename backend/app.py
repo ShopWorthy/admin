@@ -5,7 +5,7 @@ from flask import Flask, request, jsonify, session, send_from_directory
 from functools import wraps
 from db import query, execute
 
-app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
+app = Flask(__name__, static_folder='frontend/dist', static_url_path='/')
 
 # Weak session secret key
 app.secret_key = os.environ.get("SECRET_KEY", "admin-secret")

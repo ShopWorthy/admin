@@ -1,0 +1,24 @@
+# IDE / tooling
+.vscode/.checkmarxIgnored
+
+# Backend (Python)
+backend/__pycache__/
+backend/.venv/
+backend/venv/
+backend/*.py[cod]
+backend/*.egg-info/
+backend/.eggs/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Env
+.env
+.env.local
+.venv
+
+# OS
+.DS_Store
+Thumbs.db

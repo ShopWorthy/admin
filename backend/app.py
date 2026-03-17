@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from flask import Flask, request, jsonify, session, send_from_directory
+from flask import Flask, request, jsonify, session, send_from_directory, Response
 from functools import wraps
 from db import query, execute
 
@@ -116,6 +116,41 @@ def get_inventory():
         return jsonify(items)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# --- OpenAPI / Swagger ---
+OPENAPI_PATH = os.path.join(os.path.dirname(__file__), "openapi.json")
+
+
+@app.route("/admin/api-docs/openapi.json")
+def openapi_spec():
+    try:
+        with open(OPENAPI_PATH, "r", encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    except Exception:
+        return jsonify({"error": "OpenAPI spec not found"}), 500
+
+
+@app.route("/admin/api-docs")
+def api_docs():
+    html = """<!DOCTYPE html>
+<html>
+<head>
+  <title>ShopWorthy Admin API - Swagger UI</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    SwaggerUIBundle({
+      url: '/admin/api-docs/openapi.json',
+      dom_id: '#swagger-ui',
+    });
+  </script>
+</body>
+</html>"""
+    return Response(html, mimetype="text/html")
 
 
 @app.route("/admin/files/<path:filename>")

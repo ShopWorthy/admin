@@ -1,0 +1,89 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ShopWorthy Admin API",
+    "description": "Admin panel backend API: stats, orders, users, inventory. Session auth required.",
+    "version": "1.0.0"
+  },
+  "servers": [{ "url": "/admin", "description": "Admin API base" }],
+  "paths": {
+    "/api/stats": {
+      "get": {
+        "summary": "Dashboard stats",
+        "security": [{ "sessionAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orders": { "type": "integer" },
+                    "users": { "type": "integer" },
+                    "inventory_items": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "summary": "List orders",
+        "security": [{ "sessionAuth": [] }],
+        "responses": { "200": { "description": "List of orders" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/orders/{order_id}/status": {
+      "put": {
+        "summary": "Update order status",
+        "security": [{ "sessionAuth": [] }],
+        "parameters": [{ "name": "order_id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "type": "object", "properties": { "status": { "type": "string" } } }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "List users",
+        "security": [{ "sessionAuth": [] }],
+        "responses": { "200": { "description": "List of users" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/users/{user_id}": {
+      "delete": {
+        "summary": "Delete user",
+        "security": [{ "sessionAuth": [] }],
+        "parameters": [{ "name": "user_id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+        "responses": { "200": { "description": "OK" }, "401": { "description": "Unauthorized" } }
+      }
+    },
+    "/api/inventory": {
+      "get": {
+        "summary": "List inventory",
+        "security": [{ "sessionAuth": [] }],
+        "responses": { "200": { "description": "List of inventory items" }, "401": { "description": "Unauthorized" } }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "session",
+        "description": "Flask session cookie (set after POST /admin/login)"
+      }
+    }
+  }
+}

@@ -14,7 +14,26 @@ const routes = [
   { path: '/inventory', component: InventoryView },
 ]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHashHistory(),
   routes,
 })
+
+function isLoggedIn() {
+  return !!localStorage.getItem('admin_logged_in')
+}
+
+router.beforeEach((to, _from, next) => {
+  if (to.path === '/login') {
+    if (isLoggedIn()) next({ path: '/dashboard' })
+    else next()
+    return
+  }
+  if (!isLoggedIn()) {
+    next({ path: '/login' })
+    return
+  }
+  next()
+})
+
+export default router

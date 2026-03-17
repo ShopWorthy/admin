@@ -13,6 +13,12 @@ ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASS = os.environ.get("ADMIN_PASS", "admin")  # Default credentials admin/admin
 
 API_URL = os.environ.get("API_URL", "http://api:4000")
+INTERNAL_API_SECRET = os.environ.get("INTERNAL_API_SECRET", "sw-internal-2024-secret")
+
+
+def _api_headers():
+    """Headers for server-to-server calls to the main API (internal routes)."""
+    return {"X-Internal-Secret": INTERNAL_API_SECRET, "Content-Type": "application/json"}
 
 
 def login_required(f):
@@ -51,8 +57,8 @@ def logout():
 def stats():
     try:
         inventory_count = len(query("SELECT id FROM inventory"))
-        orders = requests.get(f"{API_URL}/api/orders", timeout=3).json()
-        users = requests.get(f"{API_URL}/api/users", timeout=3).json()
+        orders = requests.get(f"{API_URL}/internal/orders", headers=_api_headers(), timeout=3).json()
+        users = requests.get(f"{API_URL}/internal/users", headers=_api_headers(), timeout=3).json()
         return jsonify({
             "orders": len(orders) if isinstance(orders, list) else 0,
             "users": len(users) if isinstance(users, list) else 0,
@@ -67,7 +73,7 @@ def stats():
 @login_required
 def get_orders():
     try:
-        res = requests.get(f"{API_URL}/api/orders", timeout=5)
+        res = requests.get(f"{API_URL}/internal/orders", headers=_api_headers(), timeout=5)
         return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -79,8 +85,8 @@ def update_order_status(order_id):
     data = request.get_json()
     status = data.get("status")
     try:
-        res = requests.put(f"{API_URL}/api/orders/{order_id}/status",
-                           json={"status": status}, timeout=5)
+        res = requests.put(f"{API_URL}/internal/orders/{order_id}/status",
+                           json={"status": status}, headers=_api_headers(), timeout=5)
         return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -91,7 +97,7 @@ def update_order_status(order_id):
 @login_required
 def get_users():
     try:
-        res = requests.get(f"{API_URL}/api/users", timeout=5)
+        res = requests.get(f"{API_URL}/internal/users", headers=_api_headers(), timeout=5)
         return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -101,7 +107,7 @@ def get_users():
 @login_required
 def delete_user(user_id):
     try:
-        res = requests.delete(f"{API_URL}/api/users/{user_id}", timeout=5)
+        res = requests.delete(f"{API_URL}/internal/users/{user_id}", headers=_api_headers(), timeout=5)
         return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500

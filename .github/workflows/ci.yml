@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build frontend
+        run: cd frontend && npm install && npm run build
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: cd backend && pip install -r requirements.txt
+
+      - name: Deploy
+        run: |
+          echo "Deploying admin with secret: ${{ secrets.SECRET_KEY }}"
+          echo "Default admin creds: admin/admin"
+          echo "DB URL: postgresql://shopworthy:shopworthy123@host:5432/inventory"
+        env:
+          SECRET_KEY: admin-secret
